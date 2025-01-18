@@ -306,7 +306,7 @@ void drawOptionsTab() {
     text(speedInput, width / 2 - 300, 150);
     text(ballsInput, width / 2 - 300, 350);
     text(scoreInput, width / 2 - 300, 550);
-    
+
     textSize(33);
     drawButton("To main menu\n(or press enter)", 0, 433, 266, 166);
 }
@@ -319,7 +319,7 @@ boolean isMouseOverButton(float x, float y, float w, float h) {
 boolean showOptions = false;
 
 void drawBackground() {
-  pushMatrix();
+    pushMatrix();
     drawSky(b.angle);
     popMatrix();
 
@@ -336,7 +336,6 @@ void drawIntro() {
 
     drawBackground();
 
-
     if (mousePressed && !showOptions) {
 
         if (mouseY >= height - 100) {
@@ -346,7 +345,7 @@ void drawIntro() {
 
         else if (mouseY <= height * 4 / 6 - 11) {
 
-            int y = min(mouseY, (int)(height * 4 / 6 - b.r));
+            int y = min(mouseY, (int) (height * 4 / 6 - b.r));
             y = max(y, 200);
             b.y = y;
         }
@@ -378,25 +377,43 @@ void drawIntro() {
 
 }
 
-void drawField() {
-  translate(0, 100);
+int rightScore = 1110, leftScore = 1110;
 
-  for (int x = 0; x < width; x++) {
-    // Calculate the grayscale value based on the x position
-    float grayValue = map(x, 0, width, 0, 255);
-    stroke(grayValue); // Set the stroke color
-    line(x, 0, x, height); // Draw a vertical line
-  }
+void drawField() {
+
+    for (int x = 0; x < width; x++) {
+        // Calculate the grayscale value based on the x position
+        float grayValue = map(x, 0, width, 0, 255);
+        stroke(grayValue); // Set the stroke color
+        line(x, 0, x, height); // Draw a vertical line
+    }
+
+    stroke(255, 215, 0); // Золотой цвет
+  strokeWeight(10); // Толщина границы
+  noFill(); // Без заливки
+  rect(0, 100, width, height - 100); // Граница вокруг всего поля
+}
+
+void drawScoreboard() {
+    textSize(99); // Set a large font size
+      textAlign(CENTER, CENTER);
+
+  // Draw the left score
+  text(leftScore, width / 2 - 200, 50);
+
+  // Draw the right score
+  text(rightScore, width / 2 + 200, 50);
 }
 
 void drawGame() {
 
+    pushMatrix();
+    drawField();
+    popMatrix();
 
   pushMatrix();
-  drawField();
+  drawScoreboard();
   popMatrix();
-
-  
 }
 
 void draw() {
@@ -409,7 +426,6 @@ void draw() {
             break;
     }
 
-    
     b.roll();
 }
 
@@ -426,8 +442,8 @@ void mousePressed() {
             activeInputField = 0; // Deactivate all inputs
         }
 
-        if(isMouseOverButton(0, 733, 266, 166)) {
-          showOptions = false;
+        if (isMouseOverButton(0, 733, 266, 166)) {
+            showOptions = false;
         }
     }
 
@@ -493,7 +509,7 @@ void keyReleased() {
                         }
                         break;
                 }
-                
+
             } else if (key >= '0' && key <= '9') {
                 // Handle numeric input
                 switch (activeInputField) {
@@ -507,8 +523,8 @@ void keyReleased() {
                         scoreInput += key;
                         break;
                 }
-                } else if (key == ENTER || key == RETURN) {
-            switch (activeInputField) {
+            } else if (key == ENTER || key == RETURN) {
+                switch (activeInputField) {
                     case 1:
                         try {
                             gameSpeed = Integer.parseInt(speedInput);
@@ -535,12 +551,11 @@ void keyReleased() {
                         break;
                 }
                 activeInputField = 0;
+            }
+        } else {
+            if (key == ENTER || key == RETURN || key == ESC) {
+                showOptions = false;
+            }
         }
     }
-    else {
-      if(key == ENTER || key == RETURN || key == ESC) {
-        showOptions = false;
-      }
-    }
-}
 }

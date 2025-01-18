@@ -138,6 +138,7 @@ void drawSun(float a) {
 void drawSlider(float t) {
 
     translate(40, height - 45);
+    textSize(12);
 
     int barLength = width - 2 * 40;
 
@@ -263,10 +264,8 @@ void drawSky(float a) {
 void drawButton(String label, float x, float y, float w, float h) {
     // Draw button text
     fill(255, 215, 0); // Golden text
-    textSize(66);
     textAlign(CENTER, CENTER);
     text(label, x + w / 2, y + h / 2);
-    textSize(12);
 
     // Draw button border(optional)
     noFill();
@@ -274,13 +273,12 @@ void drawButton(String label, float x, float y, float w, float h) {
     rect(x, y, w, h);
 }
 
-void drawInputField(String label, String input, float x, float y, float w, float h, boolean active) {
+void drawInputField(String label, float x, float y, float w, float h, boolean active) {
 
     // Draw input field background
     fill(active ? 200 : 100); // Highlight if active
     rect(x, y, w, h);
 
-    fill(0); // Black text
     textAlign(LEFT, CENTER);
 
     // Draw label
@@ -298,18 +296,19 @@ void drawOptionsTab() {
     rect(0, 0, width, 600); // Adjust height as needed
 
     // Draw input fields and labels
-    drawInputField("Game Speed", speedInput, width / 2 - 300, 100, 600, 100, activeInputField == 1);
-    drawInputField("Number of Balls", ballsInput, width / 2 - 300, 300, 600, 100, activeInputField == 2);
-    drawInputField("Finish Score", scoreInput, width / 2 - 300, 500, 600, 100, activeInputField == 3);
+    drawInputField("Game Speed", width / 2 - 300, 100, 600, 100, activeInputField == 1);
+    drawInputField("Number of Balls", width / 2 - 300, 300, 600, 100, activeInputField == 2);
+    drawInputField("Finish Score", width / 2 - 300, 500, 600, 100, activeInputField == 3);
 
     // Display current values
     fill(255, 215, 0); // Golden text
     textAlign(LEFT, CENTER);
-    text(gameSpeed, width / 2 - 300, 150);
-    text(numBalls, width / 2 - 300, 350);
-    text(finishScore, width / 2 - 300, 550);
-    textSize(12);
+    text(speedInput, width / 2 - 300, 150);
+    text(ballsInput, width / 2 - 300, 350);
+    text(scoreInput, width / 2 - 300, 550);
 
+    textSize(33);
+    drawButton("To main menu\n(or press enter)", 0, 433, 266, 166);
 }
 
 boolean isMouseOverButton(float x, float y, float w, float h) {
@@ -319,25 +318,7 @@ boolean isMouseOverButton(float x, float y, float w, float h) {
 
 boolean showOptions = false;
 
-void drawIntro() {
-
-    background(b.color1);
-
-    if (mousePressed) {
-
-        if (mouseY >= height - 100) {
-            int a = constrain(mouseX, 40, width - 40);
-            b.t = map(a, 40, width - 40, 0.0, 1.0);
-        }
-
-        else {
-
-            int y = min(mouseY, height - 100 - 200);
-            y = max(y, 200);
-            b.y = y;
-        }
-    }
-
+void drawBackground() {
     pushMatrix();
     drawSky(b.angle);
     popMatrix();
@@ -349,6 +330,26 @@ void drawIntro() {
     pushMatrix();
     drawMoon(b.angle);
     popMatrix();
+}
+
+void drawIntro() {
+
+    drawBackground();
+
+    if (mousePressed && !showOptions) {
+
+        if (mouseY >= height - 100) {
+            int a = constrain(mouseX, 40, width - 40);
+            b.t = map(a, 40, width - 40, 0.0, 1.0);
+        }
+
+        else if (mouseY <= height * 4 / 6 - 11) {
+
+            int y = min(mouseY, (int) (height * 4 / 6 - b.r));
+            y = max(y, 200);
+            b.y = y;
+        }
+    }
 
     pushMatrix();
     drawMountains();
@@ -361,8 +362,8 @@ void drawIntro() {
     pushMatrix();
     b.draw();
     popMatrix();
-    b.roll();
 
+    textSize(66);
     // Draw "Start Game" button
     drawButton("Start Game", width / 2 - 200, height * 4 / 6, 400, 88);
 
@@ -376,7 +377,22 @@ void drawIntro() {
 
 }
 
+void drawField() {
+    translate(0, 100);
+
+    for (int x = 0; x < width; x++) {
+        // Calculate the grayscale value based on the x position
+        float grayValue = map(x, 0, width, 0, 255);
+        stroke(grayValue); // Set the stroke color
+        line(x, 0, x, height); // Draw a vertical line
+    }
+}
+
 void drawGame() {
+
+    pushMatrix();
+    drawField();
+    popMatrix();
 
 }
 
@@ -384,10 +400,13 @@ void draw() {
     switch (state) {
         case INTRO:
             drawIntro();
+            break;
         case GAME:
             drawGame();
             break;
     }
+
+    b.roll();
 }
 
 void mousePressed() {
@@ -401,6 +420,10 @@ void mousePressed() {
             activeInputField = 3; // Activate finish score input
         } else {
             activeInputField = 0; // Deactivate all inputs
+        }
+
+        if (isMouseOverButton(0, 733, 266, 166)) {
+            showOptions = false;
         }
     }
 
@@ -445,6 +468,7 @@ void keyReleased() {
     }
 
     if (showOptions) {
+        print(key, activeInputField);
         if (activeInputField != 0) {
             if (key == BACKSPACE) {
                 // Handle backspace
@@ -465,34 +489,8 @@ void keyReleased() {
                         }
                         break;
                 }
-                switch (activeInputField) {
-                    case 1:
-                        try {
-                            gameSpeed = Float.parseFloat(speedInput);
-                        } catch (NumberFormatException e) {
-                            gameSpeed = 1.0; // Reset to default if input is invalid
-                        }
-                        speedInput = ""; // Clear input field
-                        break;
-                    case 2:
-                        try {
-                            numBalls = Integer.parseInt(ballsInput);
-                        } catch (NumberFormatException e) {
-                            numBalls = 5; // Reset to default if input is invalid
-                        }
-                        ballsInput = ""; // Clear input field
-                        break;
-                    case 3:
-                        try {
-                            finishScore = Integer.parseInt(scoreInput);
-                        } catch (NumberFormatException e) {
-                            finishScore = 100; // Reset to default if input is invalid
-                        }
-                        scoreInput = ""; // Clear input field
-                        break;
-                }
-                activeInputField = 0; // Deactivate input field
-            } else if (key >= '0' && key <= '9' || key == '.') {
+
+            } else if (key >= '0' && key <= '9') {
                 // Handle numeric input
                 switch (activeInputField) {
                     case 1:
@@ -505,8 +503,39 @@ void keyReleased() {
                         scoreInput += key;
                         break;
                 }
+            } else if (key == ENTER || key == RETURN) {
+                switch (activeInputField) {
+                    case 1:
+                        try {
+                            gameSpeed = Integer.parseInt(speedInput);
+                        } catch (NumberFormatException e) {
+                            gameSpeed = 5; // Reset to default if input is invalid
+                            speedInput = "5";
+                        }
+                        break;
+                    case 2:
+                        try {
+                            numBalls = Integer.parseInt(ballsInput);
+                        } catch (NumberFormatException e) {
+                            numBalls = 1; // Reset to default if input is invalid
+                            ballsInput = "1";
+                        }
+                        break;
+                    case 3:
+                        try {
+                            finishScore = Integer.parseInt(scoreInput);
+                        } catch (NumberFormatException e) {
+                            finishScore = 20; // Reset to default if input is invalid
+                            scoreInput = "20";
+                        }
+                        break;
+                }
+                activeInputField = 0;
             }
-
+        } else {
+            if (key == ENTER || key == RETURN || key == ESC) {
+                showOptions = false;
+            }
         }
     }
 }
