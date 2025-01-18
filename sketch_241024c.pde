@@ -138,6 +138,7 @@ void drawSun(float a) {
 void drawSlider(float t) {
 
     translate(40, height - 45);
+    textSize(12);
 
     int barLength = width - 2 * 40;
 
@@ -263,10 +264,8 @@ void drawSky(float a) {
 void drawButton(String label, float x, float y, float w, float h) {
     // Draw button text
     fill(255, 215, 0); // Golden text
-    textSize(66);
     textAlign(CENTER, CENTER);
     text(label, x + w / 2, y + h / 2);
-    textSize(12);
 
     // Draw button border(optional)
     noFill();
@@ -274,13 +273,12 @@ void drawButton(String label, float x, float y, float w, float h) {
     rect(x, y, w, h);
 }
 
-void drawInputField(String label, String input, float x, float y, float w, float h, boolean active) {
+void drawInputField(String label, float x, float y, float w, float h, boolean active) {
 
     // Draw input field background
     fill(active ? 200 : 100); // Highlight if active
     rect(x, y, w, h);
 
-    fill(0); // Black text
     textAlign(LEFT, CENTER);
 
     // Draw label
@@ -298,9 +296,9 @@ void drawOptionsTab() {
     rect(0, 0, width, 600); // Adjust height as needed
 
     // Draw input fields and labels
-    drawInputField("Game Speed", speedInput, width / 2 - 300, 100, 600, 100, activeInputField == 1);
-    drawInputField("Number of Balls", ballsInput, width / 2 - 300, 300, 600, 100, activeInputField == 2);
-    drawInputField("Finish Score", scoreInput, width / 2 - 300, 500, 600, 100, activeInputField == 3);
+    drawInputField("Game Speed", width / 2 - 300, 100, 600, 100, activeInputField == 1);
+    drawInputField("Number of Balls", width / 2 - 300, 300, 600, 100, activeInputField == 2);
+    drawInputField("Finish Score", width / 2 - 300, 500, 600, 100, activeInputField == 3);
 
     // Display current values
     fill(255, 215, 0); // Golden text
@@ -308,8 +306,9 @@ void drawOptionsTab() {
     text(speedInput, width / 2 - 300, 150);
     text(ballsInput, width / 2 - 300, 350);
     text(scoreInput, width / 2 - 300, 550);
-    textSize(12);
-
+    
+    textSize(33);
+    drawButton("To main menu\n(or press enter)", 0, 433, 266, 166);
 }
 
 boolean isMouseOverButton(float x, float y, float w, float h) {
@@ -323,16 +322,16 @@ void drawIntro() {
 
     background(b.color1);
 
-    if (mousePressed) {
+    if (mousePressed && !showOptions) {
 
         if (mouseY >= height - 100) {
             int a = constrain(mouseX, 40, width - 40);
             b.t = map(a, 40, width - 40, 0.0, 1.0);
         }
 
-        else {
+        else if (mouseY <= height * 4 / 6 - 11) {
 
-            int y = min(mouseY, height - 100 - 200);
+            int y = min(mouseY, (int)(height * 4 / 6 - b.r));
             y = max(y, 200);
             b.y = y;
         }
@@ -363,6 +362,7 @@ void drawIntro() {
     popMatrix();
     b.roll();
 
+    textSize(66);
     // Draw "Start Game" button
     drawButton("Start Game", width / 2 - 200, height * 4 / 6, 400, 88);
 
@@ -401,6 +401,10 @@ void mousePressed() {
             activeInputField = 3; // Activate finish score input
         } else {
             activeInputField = 0; // Deactivate all inputs
+        }
+
+        if(isMouseOverButton(0, 733, 266, 166)) {
+          showOptions = false;
         }
     }
 
