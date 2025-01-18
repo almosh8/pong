@@ -247,10 +247,8 @@ void drawSky(float a) {
 void drawButton(String label, float x, float y, float w, float h) {
     // Draw button text
     fill(255, 215, 0); // Golden text
-    textSize(66);
     textAlign(CENTER, CENTER);
     text(label, x + w / 2, y + h / 2);
-    textSize(12);
 
     // Draw button border(optional)
     noFill();
@@ -266,7 +264,7 @@ void draw() {
 
     if (mousePressed) {
 
-        float d = dist(mouseX, mouseY, 66, 66);
+        floatd = dist(mouseX, mouseY, 66, 66);
         if (d <= 100) {
         } else if (mouseY >= height - 100) {
             int a = constrain(mouseX, 40, width - 40);
@@ -305,14 +303,14 @@ void draw() {
     b.roll();
 
     // Draw "Start Game" button
-    drawButton("Start Game", width / 2 - 200, height * 4 / 6, 400, 88);
+    drawButton("Start Game", 100, 100, 200, 50);
 
     // Draw "Options" button
-    drawButton("Options", width / 2 - 200, height * 5 / 6, 400, 88);
+    drawButton("Options", 100, 170, 200, 50);
 
     // Display options tab if showOptions is true
     if (showOptions) {
-        //drawOptionsTab();
+        drawOptionsTab();
     }
 
 }
