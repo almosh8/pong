@@ -27,7 +27,7 @@ static class AngleGenerator {
 class Ball {
   private float angle = 0;
 
-  public float rotationSpeed = 0.09;
+  public float rotationSpeed = 0.19;
   public float t = 0.0;
 
   public int color1 = -1;
@@ -223,7 +223,6 @@ void drawSky(float a) {
         stroke(gradientColor);
         arc(0, 0, 1555, 1555, a1, a2 + (a2 - a1) / 5);
         arc(0, 0, 1555, 1555, b2, b1 + (a2 - a1) / 5);
-        //print(a1, a2, b1, b2);
   }
 }
 
