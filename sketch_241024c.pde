@@ -280,7 +280,6 @@ void drawInputField(String label, String input, float x, float y, float w, float
   fill(active ? 200 : 100); // Highlight if active
   rect(x, y, w, h);
 
-  // Draw input text
   fill(0); // Black text
   textAlign(LEFT, CENTER);
 
@@ -329,13 +328,6 @@ void drawIntro() {
         if (mouseY >= height - 100) {
             int a = constrain(mouseX, 40, width - 40);
             b.t = map(a, 40, width - 40, 0.0, 1.0);
-        } else if (isMouseOverButton(width / 2 - 200, height * 4 / 6, 400, 88)) {
-            state = GAME;
-        }
-
-        // Check if "Options" button is clicked
-        if (isMouseOverButton(width / 2 - 200, height * 5 / 6, 400, 88)) {
-            showOptions = true;
         }
 
         else {
@@ -399,11 +391,32 @@ void draw() {
 }
 
 void mousePressed() {
-    float d = dist(mouseX, mouseY, 66, 66);
-    if (d <= 100) { // Радиус кружка равен 100
-        int t = b.color1;
-        b.color1 = b.color2;
-        b.color2 = t;
+  print(showOptions);
+    if(showOptions) {
+        if (isMouseOverButton(width / 2 - 300, 400, 600, 100)) {
+      activeInputField = 1; // Activate game speed input
+    } else if (isMouseOverButton(width / 2 - 300, 600, 600, 100)) {
+      activeInputField = 2; // Activate number of balls input
+    } else if (isMouseOverButton(width / 2 - 300, 800, 600, 100)) {
+      activeInputField = 3; // Activate finish score input
+    } else {
+      activeInputField = 0; // Deactivate all inputs
+    }
+    }
+
+    else {
+      switch (state) {
+        case INTRO:
+          if (isMouseOverButton(width / 2 - 200, height * 4 / 6, 400, 88)) {
+            state = GAME;
+          }
+
+          // Check if "Options" button is clicked
+          else if (isMouseOverButton(width / 2 - 200, height * 5 / 6, 400, 88)) {
+              showOptions = true;
+          }
+        break;
+      }
     }
 }
 
