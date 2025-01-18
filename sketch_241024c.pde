@@ -318,9 +318,24 @@ boolean isMouseOverButton(float x, float y, float w, float h) {
 
 boolean showOptions = false;
 
+void drawBackground() {
+  pushMatrix();
+    drawSky(b.angle);
+    popMatrix();
+
+    pushMatrix();
+    drawSun(b.angle);
+    popMatrix();
+
+    pushMatrix();
+    drawMoon(b.angle);
+    popMatrix();
+}
+
 void drawIntro() {
 
-    background(b.color1);
+    drawBackground();
+
 
     if (mousePressed && !showOptions) {
 
@@ -338,18 +353,6 @@ void drawIntro() {
     }
 
     pushMatrix();
-    drawSky(b.angle);
-    popMatrix();
-
-    pushMatrix();
-    drawSun(b.angle);
-    popMatrix();
-
-    pushMatrix();
-    drawMoon(b.angle);
-    popMatrix();
-
-    pushMatrix();
     drawMountains();
     popMatrix();
 
@@ -360,7 +363,6 @@ void drawIntro() {
     pushMatrix();
     b.draw();
     popMatrix();
-    b.roll();
 
     textSize(66);
     // Draw "Start Game" button
@@ -376,18 +378,39 @@ void drawIntro() {
 
 }
 
+void drawField() {
+  translate(0, 100);
+
+  for (int x = 0; x < width; x++) {
+    // Calculate the grayscale value based on the x position
+    float grayValue = map(x, 0, width, 0, 255);
+    stroke(grayValue); // Set the stroke color
+    line(x, 0, x, height); // Draw a vertical line
+  }
+}
+
 void drawGame() {
 
+
+  pushMatrix();
+  drawField();
+  popMatrix();
+
+  
 }
 
 void draw() {
     switch (state) {
         case INTRO:
             drawIntro();
+            break;
         case GAME:
             drawGame();
             break;
     }
+
+    
+    b.roll();
 }
 
 void mousePressed() {
