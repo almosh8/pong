@@ -17,7 +17,7 @@ void setup() {
 
 static class AngleGenerator {
 
-  static Random random = new Random(System.currentTimeMillis());
+  public static Random random = new Random(System.currentTimeMillis());
 
   public static float nextAngle() {
     return random.nextFloat() * TWO_PI;
@@ -42,6 +42,7 @@ class Ball {
   
   public Ball() {
     moveAngle = AngleGenerator.nextAngle();
+    t = AngleGenerator.random.nextFloat();
     while ((PI / 2 - 0.2 < moveAngle && moveAngle < PI / 2 + 0.2) || (PI / 2 - 0.2 < -moveAngle && -moveAngle < PI / 2 + 0.2) ||
            (PI - 0.2 < moveAngle && moveAngle < PI + 0.2) || (PI - 0.2 < -moveAngle && -moveAngle < PI + 0.2)) {
         moveAngle = AngleGenerator.nextAngle();
@@ -196,7 +197,10 @@ void drawMoon(float a) {
   
    endShape();
   
-  
+  strokeWeight(2);
+  stroke(b.color2);
+  line(0, 0, 0, -444);
+
 }
 
 void drawSky(float a) {
