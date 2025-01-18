@@ -188,7 +188,7 @@ void drawMoon(float a) {
   endShape();
   
   beginShape();
-    fill(b.color1);
+    fill(b.color2);
   curveVertex(x - radius * 3, y - radius);
   curveVertex(x, y - radius);
   curveVertex(x, y + radius);
@@ -208,14 +208,32 @@ void drawSky(float a) {
 
   //display gradient
   int n = 200;
+
+
   float a1 = PI * 3/2, a2 = PI * 3/2;
   float b1 = PI * 3/2, b2 = PI * 3/2;
+
+  float segmentWithoutGradient = PI / 12;
+
+  fill(nightColor);
+        stroke(nightColor);
+        arc(0, 0, 1555, 1555, a1 - segmentWithoutGradient / 2, 
+        a1 + segmentWithoutGradient / 2);
+
+  
+  fill(dayColor);
+        stroke(dayColor);
+  arc(0, 0, 1555, 1555, a1 + PI - segmentWithoutGradient / 2, 
+        a1 + PI + segmentWithoutGradient / 2);
+
+  a1 += segmentWithoutGradient / 2;
+  b1 -= segmentWithoutGradient / 2;
   for(int i = 0; i < n; i++) {
     float inter = map(i, 0, n, 0, 1);
     a1 = a2;
-    a2 += PI / n;
+    a2 += (PI - segmentWithoutGradient / 2) / n;
     b1 = b2;
-    b2 -= PI / n;
+    b2 -= (PI - segmentWithoutGradient / 2) / n;
 
     color gradientColor = lerpColor(nightColor, dayColor, inter);
 
