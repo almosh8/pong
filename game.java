@@ -1,6 +1,22 @@
 import java.util.Random;
 
 Ball b;
+final int INTRO = 0;
+final int GAME = 1;
+
+int state = INTRO;
+
+int gameSpeed = 5; // Default game speed
+int numBalls = 1; // Default number of balls
+int finishScore = 20; // Default finish score
+
+// Input fields
+String speedInput = "5";
+String ballsInput = "1";
+String scoreInput = "20";
+
+// Track which input field is active
+int activeInputField = 0; // 0 = none, 1 = speed, 2 = balls, 3 = score
 
 void setup() {
 
@@ -258,10 +274,52 @@ void drawButton(String label, float x, float y, float w, float h) {
     rect(x, y, w, h);
 }
 
-boolean showOptions = false;
-boolean gameStarted = false;
+void drawInputField(String label, String input, float x, float y, float w, float h, boolean active) {
 
-void draw() {
+    // Draw input field background
+    fill(active ? 200 : 100); // Highlight if active
+    rect(x, y, w, h);
+
+    fill(0); // Black text
+    textAlign(LEFT, CENTER);
+
+    // Draw label
+    fill(255, 215, 0); // Golden text
+    text(label, x, y - 40);
+}
+
+void drawOptionsTab() {
+    translate(0, 300);
+    textSize(66);
+
+    // Draw a simple options tab at the top of the screen
+    fill(50); // Dark background for the tab
+    noStroke();
+    rect(0, 0, width, 600); // Adjust height as needed
+
+    // Draw input fields and labels
+    drawInputField("Game Speed", speedInput, width / 2 - 300, 100, 600, 100, activeInputField == 1);
+    drawInputField("Number of Balls", ballsInput, width / 2 - 300, 300, 600, 100, activeInputField == 2);
+    drawInputField("Finish Score", scoreInput, width / 2 - 300, 500, 600, 100, activeInputField == 3);
+
+    // Display current values
+    fill(255, 215, 0); // Golden text
+    textAlign(LEFT, CENTER);
+    text(gameSpeed, width / 2 - 300, 150);
+    text(numBalls, width / 2 - 300, 350);
+    text(finishScore, width / 2 - 300, 550);
+    textSize(12);
+
+}
+
+boolean isMouseOverButton(float x, float y, float w, float h) {
+    // Check if the mouse is within the button's bounds
+    return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+}
+
+boolean showOptions = false;
+
+void drawIntro() {
 
     background(b.color1);
 
@@ -270,13 +328,6 @@ void draw() {
         if (mouseY >= height - 100) {
             int a = constrain(mouseX, 40, width - 40);
             b.t = map(a, 40, width - 40, 0.0, 1.0);
-        } else if (isMouseOverButton(width / 2 - 200, height * 4 / 6, 400, 88)) {
-            gameStarted = true;
-        }
-
-        // Check if "Options" button is clicked
-        if (isMouseOverButton(width / 2 - 200, height * 5 / 6, 400, 88)) {
-            showOptions = true;
         }
 
         else {
@@ -320,39 +371,142 @@ void draw() {
 
     // Display options tab if showOptions is true
     if (showOptions) {
-        // drawOptionsTab();
+        drawOptionsTab();
     }
 
 }
 
+void drawGame() {
+
+}
+
+void draw() {
+    switch (state) {
+        case INTRO:
+            drawIntro();
+        case GAME:
+            drawGame();
+            break;
+    }
+}
+
 void mousePressed() {
-    float d = dist(mouseX, mouseY, 66, 66);
-    if (d <= 100) { // Радиус кружка равен 100
-        int t = b.color1;
-        b.color1 = b.color2;
-        b.color2 = t;
+    print(showOptions);
+    if (showOptions) {
+        if (isMouseOverButton(width / 2 - 300, 400, 600, 100)) {
+            activeInputField = 1; // Activate game speed input
+        } else if (isMouseOverButton(width / 2 - 300, 600, 600, 100)) {
+            activeInputField = 2; // Activate number of balls input
+        } else if (isMouseOverButton(width / 2 - 300, 800, 600, 100)) {
+            activeInputField = 3; // Activate finish score input
+        } else {
+            activeInputField = 0; // Deactivate all inputs
+        }
+    }
+
+    else {
+        switch (state) {
+            case INTRO:
+                if (isMouseOverButton(width / 2 - 200, height * 4 / 6, 400, 88)) {
+                    state = GAME;
+                }
+
+                // Check if "Options" button is clicked
+                else if (isMouseOverButton(width / 2 - 200, height * 5 / 6, 400, 88)) {
+                    showOptions = true;
+                }
+                break;
+        }
     }
 }
 
 void keyReleased() {
-    if (key == CODED) {
-        if (keyCode == LEFT) {
-            b.t = max(0, b.t - 0.1);
+    if (state == INTRO) {
+        if (key == CODED) {
+            if (keyCode == LEFT) {
+                b.t = max(0, b.t - 0.1);
+            }
+            if (keyCode == RIGHT) {
+                b.t = min(1, b.t + 0.1);
+            }
+            if (keyCode == UP) {
+                b.y = max(b.r, b.y - 55);
+            }
+            if (keyCode == DOWN) {
+                b.y = min(height - b.r, b.y + 55);
+            }
+            if (keyCode == ALT) {
+                b.r = max(1, b.r - 55);
+            }
+            if (keyCode == SHIFT) {
+                b.r = min(300, b.r + 55);
+            }
         }
-        if (keyCode == RIGHT) {
-            b.t = min(1, b.t + 0.1);
-        }
-        if (keyCode == UP) {
-            b.y = max(b.r, b.y - 55);
-        }
-        if (keyCode == DOWN) {
-            b.y = min(height - b.r, b.y + 55);
-        }
-        if (keyCode == ALT) {
-            b.r = max(1, b.r - 55);
-        }
-        if (keyCode == SHIFT) {
-            b.r = min(300, b.r + 55);
+    }
+
+    if (showOptions) {
+        if (activeInputField != 0) {
+            if (key == BACKSPACE) {
+                // Handle backspace
+                switch (activeInputField) {
+                    case 1:
+                        if (speedInput.length() > 0) {
+                            speedInput = speedInput.substring(0, speedInput.length() - 1);
+                        }
+                        break;
+                    case 2:
+                        if (ballsInput.length() > 0) {
+                            ballsInput = ballsInput.substring(0, ballsInput.length() - 1);
+                        }
+                        break;
+                    case 3:
+                        if (scoreInput.length() > 0) {
+                            scoreInput = scoreInput.substring(0, scoreInput.length() - 1);
+                        }
+                        break;
+                }
+                switch (activeInputField) {
+                    case 1:
+                        try {
+                            gameSpeed = Float.parseFloat(speedInput);
+                        } catch (NumberFormatException e) {
+                            gameSpeed = 1.0; // Reset to default if input is invalid
+                        }
+                        speedInput = ""; // Clear input field
+                        break;
+                    case 2:
+                        try {
+                            numBalls = Integer.parseInt(ballsInput);
+                        } catch (NumberFormatException e) {
+                            numBalls = 5; // Reset to default if input is invalid
+                        }
+                        ballsInput = ""; // Clear input field
+                        break;
+                    case 3:
+                        try {
+                            finishScore = Integer.parseInt(scoreInput);
+                        } catch (NumberFormatException e) {
+                            finishScore = 100; // Reset to default if input is invalid
+                        }
+                        scoreInput = ""; // Clear input field
+                        break;
+                }
+                activeInputField = 0; // Deactivate input field
+            } else if (key >= '0' && key <= '9' || key == '.') {
+                // Handle numeric input
+                switch (activeInputField) {
+                    case 1:
+                        speedInput += key;
+                        break;
+                    case 2:
+                        ballsInput += key;
+                        break;
+                    case 3:
+                        scoreInput += key;
+                        break;
+                }
+            }
+
         }
     }
 }
