@@ -1,6 +1,10 @@
 import java.util.Random;
 
 Ball b;
+final int INTRO = 0;
+final int GAME = 1;
+
+int state = INTRO;
 
 void setup() {
 
@@ -258,20 +262,34 @@ void drawButton(String label, float x, float y, float w, float h) {
     rect(x, y, w, h);
 }
 
+void drawOptionsTab() {}
+
+boolean isMouseOverButton(float x, float y, float w, float h) {
+  // Check if the mouse is within the button's bounds
+  return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+}
+
 boolean showOptions = false;
 
-void draw() {
+void drawIntro() {
 
     background(b.color1);
 
     if (mousePressed) {
 
-        float d = dist(mouseX, mouseY, 66, 66);
-        if (d <= 100) {
-        } else if (mouseY >= height - 100) {
+        if (mouseY >= height - 100) {
             int a = constrain(mouseX, 40, width - 40);
             b.t = map(a, 40, width - 40, 0.0, 1.0);
-        } else {
+        } else if (isMouseOverButton(width / 2 - 200, height * 4 / 6, 400, 88)) {
+            state = GAME;
+        }
+
+        // Check if "Options" button is clicked
+        if (isMouseOverButton(width / 2 - 200, height * 5 / 6, 400, 88)) {
+            showOptions = true;
+        }
+
+        else {
 
             int y = min(mouseY, height - 100 - 200);
             y = max(y, 200);
@@ -312,9 +330,23 @@ void draw() {
 
     // Display options tab if showOptions is true
     if (showOptions) {
-        //drawOptionsTab();
+        drawOptionsTab();
     }
 
+}
+
+void drawGame() {
+
+}
+
+void draw() {
+  switch (state) {
+    case INTRO :
+      drawIntro();
+    case GAME:
+      drawGame();
+    break;	
+  }
 }
 
 void mousePressed() {

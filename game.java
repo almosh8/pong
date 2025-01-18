@@ -247,8 +247,10 @@ void drawSky(float a) {
 void drawButton(String label, float x, float y, float w, float h) {
     // Draw button text
     fill(255, 215, 0); // Golden text
+    textSize(66);
     textAlign(CENTER, CENTER);
     text(label, x + w / 2, y + h / 2);
+    textSize(12);
 
     // Draw button border(optional)
     noFill();
@@ -257,6 +259,7 @@ void drawButton(String label, float x, float y, float w, float h) {
 }
 
 boolean showOptions = false;
+boolean gameStarted = false;
 
 void draw() {
 
@@ -264,12 +267,19 @@ void draw() {
 
     if (mousePressed) {
 
-        floatd = dist(mouseX, mouseY, 66, 66);
-        if (d <= 100) {
-        } else if (mouseY >= height - 100) {
+        if (mouseY >= height - 100) {
             int a = constrain(mouseX, 40, width - 40);
             b.t = map(a, 40, width - 40, 0.0, 1.0);
-        } else {
+        } else if (isMouseOverButton(width / 2 - 200, height * 4 / 6, 400, 88)) {
+            gameStarted = true;
+        }
+
+        // Check if "Options" button is clicked
+        if (isMouseOverButton(width / 2 - 200, height * 5 / 6, 400, 88)) {
+            showOptions = true;
+        }
+
+        else {
 
             int y = min(mouseY, height - 100 - 200);
             y = max(y, 200);
@@ -303,14 +313,14 @@ void draw() {
     b.roll();
 
     // Draw "Start Game" button
-    drawButton("Start Game", 100, 100, 200, 50);
+    drawButton("Start Game", width / 2 - 200, height * 4 / 6, 400, 88);
 
     // Draw "Options" button
-    drawButton("Options", 100, 170, 200, 50);
+    drawButton("Options", width / 2 - 200, height * 5 / 6, 400, 88);
 
     // Display options tab if showOptions is true
     if (showOptions) {
-        drawOptionsTab();
+        // drawOptionsTab();
     }
 
 }
