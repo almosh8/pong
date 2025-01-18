@@ -6,6 +6,18 @@ final int GAME = 1;
 
 int state = INTRO;
 
+int gameSpeed = 5; // Default game speed
+int numBalls = 1; // Default number of balls
+int finishScore = 20; // Default finish score
+
+// Input fields
+String speedInput = "";
+String ballsInput = "";
+String scoreInput = "";
+
+// Track which input field is active
+int activeInputField = 0; // 0 = none, 1 = speed, 2 = balls, 3 = score
+
 void setup() {
 
     b = new Ball();
@@ -262,7 +274,44 @@ void drawButton(String label, float x, float y, float w, float h) {
     rect(x, y, w, h);
 }
 
-void drawOptionsTab() {}
+void drawInputField(String label, String input, float x, float y, float w, float h, boolean active) {
+
+  // Draw input field background
+  fill(active ? 200 : 100); // Highlight if active
+  rect(x, y, w, h);
+
+  // Draw input text
+  fill(0); // Black text
+  textAlign(LEFT, CENTER);
+
+  // Draw label
+  fill(255, 215, 0); // Golden text
+  text(label, x, y - 40);
+}
+
+void drawOptionsTab() {
+  translate(0, 300);
+    textSize(66);
+
+  // Draw a simple options tab at the top of the screen
+  fill(50); // Dark background for the tab
+  noStroke();
+  rect(0, 0, width, 600); // Adjust height as needed
+
+  // Draw input fields and labels
+  drawInputField("Game Speed", speedInput, width / 2 - 300, 100, 600, 100, activeInputField == 1);
+  drawInputField("Number of Balls", ballsInput, width / 2 - 300, 300, 600, 100, activeInputField == 2);
+  drawInputField("Finish Score", scoreInput, width / 2 - 300, 500, 600, 100, activeInputField == 3);
+
+  // Display current values
+  fill(255, 215, 0); // Golden text
+  textAlign(LEFT, CENTER);
+  text(gameSpeed, width / 2 - 300, 150);
+  text(numBalls, width / 2 - 300, 350);
+  text(finishScore, width / 2 - 300, 550);
+    textSize(12);
+
+}
 
 boolean isMouseOverButton(float x, float y, float w, float h) {
   // Check if the mouse is within the button's bounds
