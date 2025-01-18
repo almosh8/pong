@@ -63,6 +63,10 @@ class Ball {
     public float moveAngle;
 
     public Ball() {
+        setAngles();
+    }
+
+    void setAngles() {
         moveAngle = AngleGenerator.nextAngle();
         t = AngleGenerator.random.nextFloat() * (AngleGenerator.random.nextFloat() < 0.5 ? -1 : 1);
         while ((PI / 2 - 0.2 < moveAngle && moveAngle < PI / 2 + 0.2)
@@ -73,22 +77,31 @@ class Ball {
     }
 
      void move() {
-        x += cos(moveAngle);
-        y += sin(moveAngle);
+        x += gameSpeed * cos(moveAngle);
+        y += gameSpeed * sin(moveAngle);
 
         // Bounce off top and bottom walls
-        if (y <= r || y >= height - r) {
-            angle = -angle;
+        if (y - r <= 100 || y + r >= height) {
+        x -= gameSpeed * cos(moveAngle);
+        y -= gameSpeed * sin(moveAngle);
+            moveAngle = 2 * PI - moveAngle;
+            
         }
 
         // Bounce off paddles
-        if (x <= paddle1.x + paddle1.w && y >= paddle1.y && y <= paddle1.y + paddle1.h) {
-            angle = PI - angle; // Reverse horizontal direction
-            x = paddle1.x + paddle1.w + r; // Prevent sticking
+        if (x + r <= paddle1.x + paddle1.w && y >= paddle1.y && y <= paddle1.y + paddle1.h) {
+            
+        x -= gameSpeed * cos(moveAngle);
+        y -= gameSpeed * sin(moveAngle);
+        moveAngle = PI - moveAngle; // Reverse horizontal direction
         }
-        if (x > paddle2.x - r && y > paddle2.y && y < paddle2.y + paddle2.h) {
-            angle = PI - angle; // Reverse horizontal direction
-            x = paddle2.x - r; // Prevent sticking
+        if (x >= paddle2.x - r && y >= paddle2.y && y <= paddle2.y + paddle2.h) {
+        
+        while(x >= paddle2.x - r) {
+        x -= gameSpeed * cos(moveAngle);
+        y -= gameSpeed * sin(moveAngle); 
+        }
+        moveAngle = PI - moveAngle; // Reverse horizontal direction
         }
 
         // Reset ball if it goes past paddles
@@ -105,7 +118,7 @@ class Ball {
     void reset() {
         x = width / 2;
         y = height / 2 + 50;
-        angle = random(-PI / 4, PI / 4); // Random new angle
+        setAngles();
     }
 
     void roll() {
@@ -497,7 +510,11 @@ void drawPaddles() {
 
 void drawBalls() {
   for(Ball ball : balls) {
+
+
+    pushMatrix();
     ball.draw();
+    popMatrix();
 
     ball.move();
     ball.roll();
@@ -513,21 +530,17 @@ void initGame() {
 }
 
 void drawGame() {
-
+  
   pushMatrix();
   drawField();
   popMatrix();
 
   pushMatrix();
+  drawPauseButton();
+  popMatrix();
+
+  pushMatrix();
   drawScoreboard();
-  popMatrix();
-
-  pushMatrix();
-  drawPauseButton();
-  popMatrix();
-
-  pushMatrix();
-  drawPauseButton();
   popMatrix();
 
   pushMatrix();
@@ -660,7 +673,7 @@ void keyReleased() {
                 switch (activeInputField) {
                     case 1:
                         try {
-                            gameSpeed = min(1, Integer.parseInt(speedInput));
+                            gameSpeed = max(1, Integer.parseInt(speedInput));
                         } catch (NumberFormatException e) {
                             gameSpeed = 5; // Reset to default if input is invalid
                             speedInput = "5";
@@ -668,7 +681,7 @@ void keyReleased() {
                         break;
                     case 2:
                         try {
-                            numBalls = min(1, Integer.parseInt(ballsInput));
+                            numBalls = max(1, Integer.parseInt(ballsInput));
                         } catch (NumberFormatException e) {
                             numBalls = 1; // Reset to default if input is invalid
                             ballsInput = "1";
@@ -676,7 +689,7 @@ void keyReleased() {
                         break;
                     case 3:
                         try {
-                            finishScore = min(1, Integer.parseInt(scoreInput));
+                            finishScore = max(1, Integer.parseInt(scoreInput));
                         } catch (NumberFormatException e) {
                             finishScore = 20; // Reset to default if input is invalid
                             scoreInput = "20";
