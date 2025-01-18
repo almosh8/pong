@@ -442,7 +442,7 @@ int rightScore = 0, leftScore = 0;
 
 void drawField() {
 
-    for (int x = 0; x < width; x++) {
+    /*for (int x = 0; x < width; x++) {
         // Calculate the grayscale value based on the x position
         float grayValue = map(x, 0, width, 0, 255);
         stroke(grayValue); // Set the stroke color
@@ -453,6 +453,9 @@ void drawField() {
   strokeWeight(10); // Толщина границы
   noFill(); // Без заливки
   rect(0, 100, width, height - 100); // Граница вокруг всего поля
+    */
+
+    image(loadImage("gradient.jpg"), 0, 0);
 }
 
 void drawScoreboard() {
@@ -495,6 +498,9 @@ void drawPaddles() {
 void drawBalls() {
   for(Ball ball : balls) {
     ball.draw();
+
+    ball.move();
+    ball.roll();
   }
 }
 
