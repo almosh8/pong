@@ -405,6 +405,25 @@ void drawScoreboard() {
   text(rightScore, width / 2 + 200, 50);
 }
 
+boolean paused;
+
+void drawPauseButton() {
+  // Set the golden color for the pause button
+  fill(255, 215, 0); // Golden color
+  noStroke();
+
+  // Draw the pause button (two vertical rectangles)
+  float pauseButtonWidth = 20; // Width of each rectangle
+  float pauseButtonHeight = 80; // Height of each rectangle
+  float gap = 10; // Gap between the two rectangles
+
+  // Left rectangle
+  rect(width / 2 - pauseButtonWidth - gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
+
+  // Right rectangle
+  rect(width / 2 + gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
+}
+
 void drawGame() {
 
     pushMatrix();
@@ -413,6 +432,10 @@ void drawGame() {
 
   pushMatrix();
   drawScoreboard();
+  popMatrix();
+
+  pushMatrix();
+  drawPauseButton();
   popMatrix();
 }
 
@@ -459,6 +482,11 @@ void mousePressed() {
                     showOptions = true;
                 }
                 break;
+
+            case GAME:
+                if(isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
+                  paused = true;
+                }
         }
     }
 }
@@ -485,6 +513,10 @@ void keyReleased() {
                 b.r = min(300, b.r + 55);
             }
         }
+    }
+
+    else if (state == GAME) {
+
     }
 
     if (showOptions) {
