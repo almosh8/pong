@@ -1,6 +1,7 @@
 import java.util.Random;
 
 Ball b;
+ArrayList<Ball> balls = new ArrayList<Ball>();
 final int INTRO = 0;
 final int GAME = 1;
 
@@ -23,6 +24,7 @@ Paddle paddle1, paddle2;
 void setup() {
 
     b = new Ball();
+    b.r = 100;
     paddle1 = new Paddle(30); // Left paddle
     paddle2 = new Paddle(width - 50); // Right paddle
 
@@ -54,15 +56,15 @@ class Ball {
     public int color2 = 0;
 
     public float x = width / 2;
-    public float y = height / 2;
+    public float y = height / 2 + 50;
 
-    public float r = 100;
+    public float r = 20;
 
     public float moveAngle;
 
     public Ball() {
         moveAngle = AngleGenerator.nextAngle();
-        t = AngleGenerator.random.nextFloat();
+        t = AngleGenerator.random.nextFloat() * (AngleGenerator.random.nextFloat() < 0.5 ? -1 : 1);
         while ((PI / 2 - 0.2 < moveAngle && moveAngle < PI / 2 + 0.2)
                 || (PI / 2 - 0.2 < -moveAngle && -moveAngle < PI / 2 + 0.2) ||
                 (PI - 0.2 < moveAngle && moveAngle < PI + 0.2) || (PI - 0.2 < -moveAngle && -moveAngle < PI + 0.2)) {
@@ -102,7 +104,7 @@ class Ball {
 
     void reset() {
         x = width / 2;
-        y = height / 2;
+        y = height / 2 + 50;
         angle = random(-PI / 4, PI / 4); // Random new angle
     }
 
@@ -490,6 +492,20 @@ void drawPaddles() {
   paddle2.display(0);
 }
 
+void drawBalls() {
+  for(Ball ball : balls) {
+    ball.draw();
+  }
+}
+
+void initGame() {
+  balls = new ArrayList<Ball>();
+
+  for(int i = 0; i < numBalls; i++) {
+    balls.add(new Ball());
+  }
+}
+
 void drawGame() {
 
   pushMatrix();
@@ -510,6 +526,10 @@ void drawGame() {
 
   pushMatrix();
   drawPaddles();
+  popMatrix();
+
+  pushMatrix();
+  drawBalls();
   popMatrix();
 }
 
@@ -549,6 +569,7 @@ void mousePressed() {
             case INTRO:
                 if (isMouseOverButton(width / 2 - 200, height * 4 / 6, 400, 88)) {
                     state = GAME;
+                    initGame();
                 }
 
                 // Check if "Options" button is clicked
@@ -633,7 +654,7 @@ void keyReleased() {
                 switch (activeInputField) {
                     case 1:
                         try {
-                            gameSpeed = Integer.parseInt(speedInput);
+                            gameSpeed = min(1, Integer.parseInt(speedInput));
                         } catch (NumberFormatException e) {
                             gameSpeed = 5; // Reset to default if input is invalid
                             speedInput = "5";
@@ -641,7 +662,7 @@ void keyReleased() {
                         break;
                     case 2:
                         try {
-                            numBalls = Integer.parseInt(ballsInput);
+                            numBalls = min(1, Integer.parseInt(ballsInput));
                         } catch (NumberFormatException e) {
                             numBalls = 1; // Reset to default if input is invalid
                             ballsInput = "1";
@@ -649,7 +670,7 @@ void keyReleased() {
                         break;
                     case 3:
                         try {
-                            finishScore = Integer.parseInt(scoreInput);
+                            finishScore = min(1, Integer.parseInt(scoreInput));
                         } catch (NumberFormatException e) {
                             finishScore = 20; // Reset to default if input is invalid
                             scoreInput = "20";
