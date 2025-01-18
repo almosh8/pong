@@ -18,9 +18,13 @@ String scoreInput = "20";
 // Track which input field is active
 int activeInputField = 0; // 0 = none, 1 = speed, 2 = balls, 3 = score
 
+Paddle paddle1, paddle2;
+
 void setup() {
 
     b = new Ball();
+    paddle1 = new Paddle(30); // Left paddle
+    paddle2 = new Paddle(width - 50); // Right paddle
 
     size(1200, 900);
     noFill();
@@ -66,6 +70,42 @@ class Ball {
         }
     }
 
+     void move() {
+        x += cos(moveAngle);
+        y += sin(moveAngle);
+
+        // Bounce off top and bottom walls
+        if (y <= r || y >= height - r) {
+            angle = -angle;
+        }
+
+        // Bounce off paddles
+        if (x <= paddle1.x + paddle1.w && y >= paddle1.y && y <= paddle1.y + paddle1.h) {
+            angle = PI - angle; // Reverse horizontal direction
+            x = paddle1.x + paddle1.w + r; // Prevent sticking
+        }
+        if (x > paddle2.x - r && y > paddle2.y && y < paddle2.y + paddle2.h) {
+            angle = PI - angle; // Reverse horizontal direction
+            x = paddle2.x - r; // Prevent sticking
+        }
+
+        // Reset ball if it goes past paddles
+        if (x < 0) {
+            rightScore++;
+            reset();
+        }
+        if (x > width) {
+            leftScore++;
+            reset();
+        }
+    }
+
+    void reset() {
+        x = width / 2;
+        y = height / 2;
+        angle = random(-PI / 4, PI / 4); // Random new angle
+    }
+
     void roll() {
         angle += rotationSpeed * t;
     }
@@ -103,6 +143,25 @@ class Ball {
 
         fill(color1);
         ellipse(0, 0.5 * r, 0.25 * r, 0.25 * r);
+    }
+}
+
+class Paddle {
+    float x, y = height / 2; // Paddle position
+    float w = 20, h = 100; // Paddle width and height
+
+    Paddle(float x) {
+        this.x = x;
+    }
+
+    void move(float dy) {
+        y += dy;
+        y = constrain(y, 0, height - h); // Keep paddle within screen
+    }
+
+    void display(float c) {
+        fill(c);
+        rect(x, y, w, h);
     }
 }
 
@@ -377,7 +436,7 @@ void drawIntro() {
 
 }
 
-int rightScore = 1110, leftScore = 1110;
+int rightScore = 0, leftScore = 0;
 
 void drawField() {
 
@@ -397,7 +456,9 @@ void drawField() {
 void drawScoreboard() {
     textSize(99); // Set a large font size
       textAlign(CENTER, CENTER);
+    
 
+  fill(255, 215, 0);
   // Draw the left score
   text(leftScore, width / 2 - 200, 50);
 
@@ -424,11 +485,16 @@ void drawPauseButton() {
   rect(width / 2 + gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
 }
 
+void drawPaddles() {
+  paddle1.display(255);
+  paddle2.display(0);
+}
+
 void drawGame() {
 
-    pushMatrix();
-    drawField();
-    popMatrix();
+  pushMatrix();
+  drawField();
+  popMatrix();
 
   pushMatrix();
   drawScoreboard();
@@ -436,6 +502,14 @@ void drawGame() {
 
   pushMatrix();
   drawPauseButton();
+  popMatrix();
+
+  pushMatrix();
+  drawPauseButton();
+  popMatrix();
+
+  pushMatrix();
+  drawPaddles();
   popMatrix();
 }
 
