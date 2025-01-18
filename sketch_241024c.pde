@@ -199,6 +199,34 @@ void drawMoon(float a) {
   
 }
 
+void drawSky(float a) {
+    translate(width / 2, height / 2);
+  rotate(a);
+  
+  color nightColor = color(0, 0,0);    // full night
+  color dayColor = color(135, 206, 250);  // Bright blue (sky blue)
+
+  //display gradient
+  int n = 200;
+  float a1 = PI * 3/2, a2 = PI * 3/2;
+  float b1 = PI * 3/2, b2 = PI * 3/2;
+  for(int i = 0; i < n; i++) {
+    float inter = map(i, 0, n, 0, 1);
+    a1 = a2;
+    a2 += PI / n;
+    b1 = b2;
+    b2 -= PI / n;
+
+    color gradientColor = lerpColor(nightColor, dayColor, inter);
+
+        fill(gradientColor);
+        stroke(gradientColor);
+        arc(0, 0, 1555, 1555, a1, a2 + (a2 - a1) / 5);
+        arc(0, 0, 1555, 1555, b2, b1 + (a2 - a1) / 5);
+        //print(a1, a2, b1, b2);
+  }
+}
+
 void draw() {
   
   background(b.color1);
@@ -221,6 +249,9 @@ void draw() {
     }
   }
   
+  pushMatrix();
+  drawSky(b.angle);
+  popMatrix();
   
   pushMatrix();
   drawSun(b.angle);
