@@ -88,6 +88,8 @@ class Ball {
             
         }
 
+        // TODO calculate intersections
+
         // Bounce off paddles
         if (x + r <= paddle1.x + paddle1.w && y >= paddle1.y && y <= paddle1.y + paddle1.h) {
             
