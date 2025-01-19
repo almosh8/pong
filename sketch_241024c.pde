@@ -4,8 +4,11 @@ Ball b;
 ArrayList<Ball> balls = new ArrayList<Ball>();
 final int INTRO = 0;
 final int GAME = 1;
+final int LEFT_WON = 2;
+final int RIGHT_WON = 3;
 
 int state = INTRO;
+
 
 int gameSpeed = 10; // Default game speed
 int numBalls = 1; // Default number of balls
@@ -119,10 +122,18 @@ class Ball {
         if (x + r < 0) {
             rightScore++;
             reset();
+
         }
         if (x - r > width) {
             leftScore++;
             reset();
+        }
+
+        if(state == GAME) {
+            if(rightScore == finishScore)
+                state = RIGHT_WON;
+            if(leftScore == finishScore)
+                state = LEFT_WON;
         }
     }
 
@@ -543,6 +554,7 @@ void initGame() {
 
 void drawGame() {
   
+
   pushMatrix();
   drawField();
   popMatrix();
@@ -555,6 +567,21 @@ void drawGame() {
   drawScoreboard();
   popMatrix();
 
+    
+    if(state != GAME) {
+        pushMatrix();
+        textSize(99); // Set a large font size
+        textAlign(CENTER, CENTER);
+
+        fill(255, 215, 0);
+  // Draw the left score
+  text(state == RIGHT_WON ? "RIGHT WINS!!!" : "LEFT WINS!!!",
+   width / 2, height / 2 + 50);
+
+popMatrix();
+   return;
+    }
+
   pushMatrix();
   drawPaddles();
   popMatrix();
@@ -563,7 +590,7 @@ void drawGame() {
   drawBalls();
   popMatrix();
 
-  if (keyPressed) {
+  if (state == GAME && keyPressed) {
         if (key == 'a' || key == 'A') paddle1.move(-5); // Left paddle up
         if (key == 'z' || key == 'Z') paddle1.move(5); // Left paddle down
         if (key == 'k' || key == 'K') paddle2.move(-5); // Right paddle up
@@ -576,9 +603,12 @@ void draw() {
         case INTRO:
             drawIntro();
             break;
+        case RIGHT_WON:
+        case LEFT_WON:
         case GAME:
             drawGame();
             break;
+
     }
 
     b.roll();
