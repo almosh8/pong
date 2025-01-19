@@ -539,8 +539,10 @@ void drawBalls() {
     ball.draw();
     popMatrix();
 
+    if(state == GAME) {
     ball.move();
     ball.roll();
+  }
   }
 }
 
@@ -568,19 +570,6 @@ void drawGame() {
   popMatrix();
 
     
-    if(state != GAME) {
-        pushMatrix();
-        textSize(99); // Set a large font size
-        textAlign(CENTER, CENTER);
-
-        fill(255, 215, 0);
-  // Draw the left score
-  text(state == RIGHT_WON ? "RIGHT WINS!!!" : "LEFT WINS!!!",
-   width / 2, height / 2 + 50);
-
-popMatrix();
-   return;
-    }
 
   pushMatrix();
   drawPaddles();
@@ -589,6 +578,25 @@ popMatrix();
   pushMatrix();
   drawBalls();
   popMatrix();
+
+  
+    if(state != GAME) {
+        pushMatrix();
+        textSize(188); // Set a large font size
+        textAlign(CENTER, CENTER);
+
+        fill(255, 215, 0);
+  // Draw the left score
+  text(state == RIGHT_WON ? "RIGHT WINS!!!" : "LEFT WINS!!!",
+   width / 2, height / 2 + 50);
+
+   textSize(66);
+text("press ENTER to continue game endlessly\npress ESCAPE to exit",
+   width / 2, height / 2 + 222);
+
+
+popMatrix();
+    }
 
   if (state == GAME && keyPressed) {
         if (key == 'a' || key == 'A') paddle1.move(-5); // Left paddle up
