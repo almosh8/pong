@@ -7,12 +7,12 @@ final int GAME = 1;
 
 int state = INTRO;
 
-int gameSpeed = 5; // Default game speed
+int gameSpeed = 10; // Default game speed
 int numBalls = 1; // Default number of balls
 int finishScore = 20; // Default finish score
 
 // Input fields
-String speedInput = "5";
+String speedInput = "10";
 String ballsInput = "1";
 String scoreInput = "20";
 
@@ -62,6 +62,8 @@ class Ball {
 
     public float moveAngle;
 
+    public boolean passed = false;
+
     public Ball() {
         setAngles();
     }
@@ -69,9 +71,8 @@ class Ball {
     void setAngles() {
         moveAngle = AngleGenerator.nextAngle();
         t = AngleGenerator.random.nextFloat() * (AngleGenerator.random.nextFloat() < 0.5 ? -1 : 1);
-        while ((PI / 2 - 0.2 < moveAngle && moveAngle < PI / 2 + 0.2)
-                || (PI / 2 - 0.2 < -moveAngle && -moveAngle < PI / 2 + 0.2) ||
-                (PI - 0.2 < moveAngle && moveAngle < PI + 0.2) || (PI - 0.2 < -moveAngle && -moveAngle < PI + 0.2)) {
+        while ((3 * PI / 2 - 0.2 < moveAngle && moveAngle < 3 * PI / 2 + 0.2) ||
+                (PI / 2 - 0.2 < moveAngle && moveAngle < PI / 2 + 0.2)) {
             moveAngle = AngleGenerator.nextAngle();
         }
     }
@@ -88,30 +89,38 @@ class Ball {
             
         }
 
-        // TODO calculate intersections
-
         // Bounce off paddles
-        if (x + r <= paddle1.x + paddle1.w && y >= paddle1.y && y <= paddle1.y + paddle1.h) {
+        if (x - r <= paddle1.x + paddle1.w && !passed) {
+        passed = true;
+        if (y >= paddle1.y && y <= paddle1.y + paddle1.h) {
             
         x -= gameSpeed * cos(moveAngle);
         y -= gameSpeed * sin(moveAngle);
         moveAngle = PI - moveAngle; // Reverse horizontal direction
+        
+        passed = false;
         }
-        if (x >= paddle2.x - r && y >= paddle2.y && y <= paddle2.y + paddle2.h) {
+        }
+        if (x + r >= paddle2.x && !passed) {
+            passed = true;
+        if(y >= paddle2.y && y <= paddle2.y + paddle2.h) {
         
         while(x >= paddle2.x - r) {
         x -= gameSpeed * cos(moveAngle);
         y -= gameSpeed * sin(moveAngle); 
         }
         moveAngle = PI - moveAngle; // Reverse horizontal direction
+                passed = false;
+
+        }
         }
 
         // Reset ball if it goes past paddles
-        if (x < 0) {
+        if (x + r < 0) {
             rightScore++;
             reset();
         }
-        if (x > width) {
+        if (x - r > width) {
             leftScore++;
             reset();
         }
@@ -121,6 +130,7 @@ class Ball {
         x = width / 2;
         y = height / 2 + 50;
         setAngles();
+        passed = false;
     }
 
     void roll() {
@@ -173,7 +183,7 @@ class Paddle {
 
     void move(float dy) {
         y += dy;
-        y = constrain(y, 0, height - h); // Keep paddle within screen
+        y = constrain(y, 100, height - h); // Keep paddle within screen
     }
 
     void display(float c) {
@@ -552,6 +562,13 @@ void drawGame() {
   pushMatrix();
   drawBalls();
   popMatrix();
+
+  if (keyPressed) {
+        if (key == 'a' || key == 'A') paddle1.move(-5); // Left paddle up
+        if (key == 'z' || key == 'Z') paddle1.move(5); // Left paddle down
+        if (key == 'k' || key == 'K') paddle2.move(-5); // Right paddle up
+        if (key == 'm' || key == 'M') paddle2.move(5); // Right paddle down
+    }
 }
 
 void draw() {
@@ -631,12 +648,7 @@ void keyReleased() {
         }
     }
 
-    else if (state == GAME) {
-
-    }
-
     if (showOptions) {
-        print(key, activeInputField);
         if (activeInputField != 0) {
             if (key == BACKSPACE) {
                 // Handle backspace
