@@ -6,6 +6,7 @@ final int INTRO = 0;
 final int GAME = 1;
 final int LEFT_WON = 2;
 final int RIGHT_WON = 3;
+final int PAUSED = 4;
 
 int state = INTRO;
 
@@ -514,6 +515,7 @@ void drawPauseButton() {
   fill(255, 215, 0); // Golden color
   noStroke();
 
+if(state != PAUSED) {
   // Draw the pause button (two vertical rectangles)
   float pauseButtonWidth = 20; // Width of each rectangle
   float pauseButtonHeight = 80; // Height of each rectangle
@@ -524,6 +526,10 @@ void drawPauseButton() {
 
   // Right rectangle
   rect(width / 2 + gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
+}
+else {
+    triangle(width / 2 - 34.6, 10, width / 2 - 34.6, 90, width / 2 + 34.6, 50);
+}
 }
 
 void drawPaddles() {
@@ -556,7 +562,7 @@ void initGame() {
 
 void drawGame() {
   
-
+    if(paused) return;
   pushMatrix();
   drawField();
   popMatrix();
@@ -580,7 +586,7 @@ void drawGame() {
   popMatrix();
 
   
-    if(state != GAME) {
+    if(state == RIGHT_WON || state == LEFT_WON) {
         pushMatrix();
         textSize(188); // Set a large font size
         textAlign(CENTER, CENTER);
@@ -596,6 +602,7 @@ text("press ENTER to continue game endlessly\npress ESCAPE to exit",
 
 
 popMatrix();
+return;
     }
 
   if (state == GAME && keyPressed) {
@@ -616,7 +623,8 @@ void draw() {
         case GAME:
             drawGame();
             break;
-
+        case PAUSED:
+            break;
     }
 
     b.roll();
@@ -656,8 +664,15 @@ void mousePressed() {
 
             case GAME:
                 if(isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
-                  paused = true;
+                  state = PAUSED;
+                  drawGame();
                 }
+                break;
+            case PAUSED:
+                if(isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
+                  state = GAME;
+                }
+                break;
         }
     }
 }
