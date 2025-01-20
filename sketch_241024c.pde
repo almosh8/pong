@@ -10,7 +10,6 @@ final int PAUSED = 4;
 
 int state = INTRO;
 
-
 int gameSpeed = 10; // Default game speed
 int numBalls = 1; // Default number of balls
 int finishScore = 20; // Default finish score
@@ -81,42 +80,42 @@ class Ball {
         }
     }
 
-     void move() {
+    void move() {
         x += gameSpeed * cos(moveAngle);
         y += gameSpeed * sin(moveAngle);
 
         // Bounce off top and bottom walls
         if (y - r <= 100 || y + r >= height) {
-        x -= gameSpeed * cos(moveAngle);
-        y -= gameSpeed * sin(moveAngle);
+            x -= gameSpeed * cos(moveAngle);
+            y -= gameSpeed * sin(moveAngle);
             moveAngle = 2 * PI - moveAngle;
-            
+
         }
 
         // Bounce off paddles
         if (x - r <= paddle1.x + paddle1.w && !passed) {
-        passed = true;
-        if (y >= paddle1.y && y <= paddle1.y + paddle1.h) {
-            
-        x -= gameSpeed * cos(moveAngle);
-        y -= gameSpeed * sin(moveAngle);
-        moveAngle = PI - moveAngle; // Reverse horizontal direction
-        
-        passed = false;
-        }
+            passed = true;
+            if (y >= paddle1.y && y <= paddle1.y + paddle1.h) {
+
+                x -= gameSpeed * cos(moveAngle);
+                y -= gameSpeed * sin(moveAngle);
+                moveAngle = PI - moveAngle; // Reverse horizontal direction
+
+                passed = false;
+            }
         }
         if (x + r >= paddle2.x && !passed) {
             passed = true;
-        if(y >= paddle2.y && y <= paddle2.y + paddle2.h) {
-        
-        while(x >= paddle2.x - r) {
-        x -= gameSpeed * cos(moveAngle);
-        y -= gameSpeed * sin(moveAngle); 
-        }
-        moveAngle = PI - moveAngle; // Reverse horizontal direction
+            if (y >= paddle2.y && y <= paddle2.y + paddle2.h) {
+
+                while (x >= paddle2.x - r) {
+                    x -= gameSpeed * cos(moveAngle);
+                    y -= gameSpeed * sin(moveAngle);
+                }
+                moveAngle = PI - moveAngle; // Reverse horizontal direction
                 passed = false;
 
-        }
+            }
         }
 
         // Reset ball if it goes past paddles
@@ -130,10 +129,10 @@ class Ball {
             reset();
         }
 
-        if(state == GAME && finishScore != -1) {
-            if(rightScore == finishScore)
+        if (state == GAME && finishScore != -1) {
+            if (rightScore == finishScore)
                 state = RIGHT_WON;
-            if(leftScore == finishScore)
+            if (leftScore == finishScore)
                 state = LEFT_WON;
         }
     }
@@ -479,137 +478,136 @@ int rightScore = 0, leftScore = 0;
 
 void drawField() {
 
-    /*for (int x = 0; x < width; x++) {
-        // Calculate the grayscale value based on the x position
-        float grayValue = map(x, 0, width, 0, 255);
-        stroke(grayValue); // Set the stroke color
-        line(x, 0, x, height); // Draw a vertical line
-    }
-
-    stroke(255, 215, 0); // Золотой цвет
-  strokeWeight(10); // Толщина границы
-  noFill(); // Без заливки
-  rect(0, 100, width, height - 100); // Граница вокруг всего поля
-    */
+    /*
+     * for (int x = 0; x < width; x++) {
+     * // Calculate the grayscale value based on the x position
+     * float grayValue = map(x, 0, width, 0, 255);
+     * stroke(grayValue); // Set the stroke color
+     * line(x, 0, x, height); // Draw a vertical line
+     * }
+     * 
+     * stroke(255, 215, 0); // Золотой цвет
+     * strokeWeight(10); // Толщина границы
+     * noFill(); // Без заливки
+     * rect(0, 100, width, height - 100); // Граница вокруг всего поля
+     */
 
     image(loadImage("gradient.jpg"), 0, 0);
 }
 
 void drawScoreboard() {
     textSize(99); // Set a large font size
-      textAlign(CENTER, CENTER);
-    
+    textAlign(CENTER, CENTER);
 
-  fill(255, 215, 0);
-  // Draw the left score
-  text(leftScore, width / 2 - 200, 50);
+    fill(255, 215, 0);
+    // Draw the left score
+    text(leftScore, width / 2 - 200, 50);
 
-  // Draw the right score
-  text(rightScore, width / 2 + 200, 50);
+    // Draw the right score
+    text(rightScore, width / 2 + 200, 50);
 }
 
 boolean paused;
 
 void drawPauseButton() {
-  // Set the golden color for the pause button
-  fill(255, 215, 0); // Golden color
-  noStroke();
+    // Set the golden color for the pause button
+    fill(255, 215, 0); // Golden color
+    noStroke();
 
-if(state != PAUSED) {
-  // Draw the pause button (two vertical rectangles)
-  float pauseButtonWidth = 20; // Width of each rectangle
-  float pauseButtonHeight = 80; // Height of each rectangle
-  float gap = 10; // Gap between the two rectangles
+    if (state != PAUSED) {
+        // Draw the pause button (two vertical rectangles)
+        float pauseButtonWidth = 20; // Width of each rectangle
+        float pauseButtonHeight = 80; // Height of each rectangle
+        float gap = 10; // Gap between the two rectangles
 
-  // Left rectangle
-  rect(width / 2 - pauseButtonWidth - gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
+        // Left rectangle
+        rect(width / 2 - pauseButtonWidth - gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
 
-  // Right rectangle
-  rect(width / 2 + gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
-}
-else {
-    triangle(width / 2 - 34.6, 10, width / 2 - 34.6, 90, width / 2 + 34.6, 50);
-}
+        // Right rectangle
+        rect(width / 2 + gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
+    } else {
+        triangle(width / 2 - 34.6, 10, width / 2 - 34.6, 90, width / 2 + 34.6, 50);
+    }
 }
 
 void drawPaddles() {
-  paddle1.display(255);
-  paddle2.display(0);
+    paddle1.display(255);
+    paddle2.display(0);
 }
 
 void drawBalls() {
-  for(Ball ball : balls) {
+    for (Ball ball : balls) {
 
+        pushMatrix();
+        ball.draw();
+        popMatrix();
 
-    pushMatrix();
-    ball.draw();
-    popMatrix();
-
-    if(state == GAME) {
-    ball.move();
-    ball.roll();
-  }
-  }
+        if (state == GAME) {
+            ball.move();
+            ball.roll();
+        }
+    }
 }
 
 void initGame() {
-  balls = new ArrayList<Ball>();
+    balls = new ArrayList<Ball>();
 
-  for(int i = 0; i < numBalls; i++) {
-    balls.add(new Ball());
-  }
+    for (int i = 0; i < numBalls; i++) {
+        balls.add(new Ball());
+    }
 }
 
 void drawGame() {
-  
-    if(paused) return;
-  pushMatrix();
-  drawField();
-  popMatrix();
 
-  pushMatrix();
-  drawPauseButton();
-  popMatrix();
+    if (paused)
+        return;
+    pushMatrix();
+    drawField();
+    popMatrix();
 
-  pushMatrix();
-  drawScoreboard();
-  popMatrix();
+    pushMatrix();
+    drawPauseButton();
+    popMatrix();
 
-    
+    pushMatrix();
+    drawScoreboard();
+    popMatrix();
 
-  pushMatrix();
-  drawPaddles();
-  popMatrix();
+    pushMatrix();
+    drawPaddles();
+    popMatrix();
 
-  pushMatrix();
-  drawBalls();
-  popMatrix();
+    pushMatrix();
+    drawBalls();
+    popMatrix();
 
-  
-    if(state == RIGHT_WON || state == LEFT_WON) {
+    if (state == RIGHT_WON || state == LEFT_WON) {
         pushMatrix();
         textSize(188); // Set a large font size
         textAlign(CENTER, CENTER);
 
         fill(255, 215, 0);
-  // Draw the left score
-  text(state == RIGHT_WON ? "RIGHT WINS!!!" : "LEFT WINS!!!",
-   width / 2, height / 2 + 50);
+        // Draw the left score
+        text(state == RIGHT_WON ? "RIGHT WINS!!!" : "LEFT WINS!!!",
+                width / 2, height / 2 + 50);
 
-   textSize(66);
-text("press ENTER to continue game endlessly\npress ESCAPE to exit",
-   width / 2, height / 2 + 222);
+        textSize(66);
+        text("press ENTER to continue game endlessly\npress ESCAPE to exit",
+                width / 2, height / 2 + 222);
 
-
-popMatrix();
-return;
+        popMatrix();
+        return;
     }
 
-  if (state == GAME && keyPressed) {
-        if (key == 'a' || key == 'A') paddle1.move(-5); // Left paddle up
-        if (key == 'z' || key == 'Z') paddle1.move(5); // Left paddle down
-        if (key == 'k' || key == 'K') paddle2.move(-5); // Right paddle up
-        if (key == 'm' || key == 'M') paddle2.move(5); // Right paddle down
+    if (state == GAME && keyPressed) {
+        if (key == 'a' || key == 'A')
+            paddle1.move(-5); // Left paddle up
+        if (key == 'z' || key == 'Z')
+            paddle1.move(5); // Left paddle down
+        if (key == 'k' || key == 'K')
+            paddle2.move(-5); // Right paddle up
+        if (key == 'm' || key == 'M')
+            paddle2.move(5); // Right paddle down
     }
 }
 
@@ -663,14 +661,14 @@ void mousePressed() {
                 break;
 
             case GAME:
-                if(isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
-                  state = PAUSED;
-                  drawGame();
+                if (isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
+                    state = PAUSED;
+                    drawGame();
                 }
                 break;
             case PAUSED:
-                if(isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
-                  state = GAME;
+                if (isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
+                    state = GAME;
                 }
                 break;
         }
@@ -765,7 +763,6 @@ void keyReleased() {
                 }
                 activeInputField = 0;
 
-                
             }
         } else {
             if (key == ENTER || key == RETURN || key == ESC) {
@@ -774,8 +771,8 @@ void keyReleased() {
         }
     }
 
-    else if(state == RIGHT_WON || state == LEFT_WON) {
-                    state = GAME;
-                    finishScore = -1;
-                }
+    else if (state == RIGHT_WON || state == LEFT_WON) {
+        state = GAME;
+        finishScore = -1;
+    }
 }

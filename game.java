@@ -1,26 +1,35 @@
 import java.util.Random;
 
 Ball b;
+ArrayList<Ball> balls = new ArrayList<Ball>();
 final int INTRO = 0;
 final int GAME = 1;
+final int LEFT_WON = 2;
+final int RIGHT_WON = 3;
+final int PAUSED = 4;
 
 int state = INTRO;
 
-int gameSpeed = 5; // Default game speed
+int gameSpeed = 10; // Default game speed
 int numBalls = 1; // Default number of balls
 int finishScore = 20; // Default finish score
 
 // Input fields
-String speedInput = "5";
+String speedInput = "10";
 String ballsInput = "1";
 String scoreInput = "20";
 
 // Track which input field is active
 int activeInputField = 0; // 0 = none, 1 = speed, 2 = balls, 3 = score
 
+Paddle paddle1, paddle2;
+
 void setup() {
 
     b = new Ball();
+    b.r = 100;
+    paddle1 = new Paddle(30); // Left paddle
+    paddle2 = new Paddle(width - 50); // Right paddle
 
     size(1200, 900);
     noFill();
@@ -50,20 +59,89 @@ class Ball {
     public int color2 = 0;
 
     public float x = width / 2;
-    public float y = height / 2;
+    public float y = height / 2 + 50;
 
-    public float r = 100;
+    public float r = 20;
 
     public float moveAngle;
 
+    public boolean passed = false;
+
     public Ball() {
+        setAngles();
+    }
+
+    void setAngles() {
         moveAngle = AngleGenerator.nextAngle();
-        t = AngleGenerator.random.nextFloat();
-        while ((PI / 2 - 0.2 < moveAngle && moveAngle < PI / 2 + 0.2)
-                || (PI / 2 - 0.2 < -moveAngle && -moveAngle < PI / 2 + 0.2) ||
-                (PI - 0.2 < moveAngle && moveAngle < PI + 0.2) || (PI - 0.2 < -moveAngle && -moveAngle < PI + 0.2)) {
+        t = AngleGenerator.random.nextFloat() * (AngleGenerator.random.nextFloat() < 0.5 ? -1 : 1);
+        while ((3 * PI / 2 - 0.2 < moveAngle && moveAngle < 3 * PI / 2 + 0.2) ||
+                (PI / 2 - 0.2 < moveAngle && moveAngle < PI / 2 + 0.2)) {
             moveAngle = AngleGenerator.nextAngle();
         }
+    }
+
+    void move() {
+        x += gameSpeed * cos(moveAngle);
+        y += gameSpeed * sin(moveAngle);
+
+        // Bounce off top and bottom walls
+        if (y - r <= 100 || y + r >= height) {
+            x -= gameSpeed * cos(moveAngle);
+            y -= gameSpeed * sin(moveAngle);
+            moveAngle = 2 * PI - moveAngle;
+
+        }
+
+        // Bounce off paddles
+        if (x - r <= paddle1.x + paddle1.w && !passed) {
+            passed = true;
+            if (y >= paddle1.y && y <= paddle1.y + paddle1.h) {
+
+                x -= gameSpeed * cos(moveAngle);
+                y -= gameSpeed * sin(moveAngle);
+                moveAngle = PI - moveAngle; // Reverse horizontal direction
+
+                passed = false;
+            }
+        }
+        if (x + r >= paddle2.x && !passed) {
+            passed = true;
+            if (y >= paddle2.y && y <= paddle2.y + paddle2.h) {
+
+                while (x >= paddle2.x - r) {
+                    x -= gameSpeed * cos(moveAngle);
+                    y -= gameSpeed * sin(moveAngle);
+                }
+                moveAngle = PI - moveAngle; // Reverse horizontal direction
+                passed = false;
+
+            }
+        }
+
+        // Reset ball if it goes past paddles
+        if (x + r < 0) {
+            rightScore++;
+            reset();
+
+        }
+        if (x - r > width) {
+            leftScore++;
+            reset();
+        }
+
+        if (state == GAME && finishScore != -1) {
+            if (rightScore == finishScore)
+                state = RIGHT_WON;
+            if (leftScore == finishScore)
+                state = LEFT_WON;
+        }
+    }
+
+    void reset() {
+        x = width / 2;
+        y = height / 2 + 50;
+        setAngles();
+        passed = false;
     }
 
     void roll() {
@@ -103,6 +181,25 @@ class Ball {
 
         fill(color1);
         ellipse(0, 0.5 * r, 0.25 * r, 0.25 * r);
+    }
+}
+
+class Paddle {
+    float x, y = height / 2; // Paddle position
+    float w = 20, h = 100; // Paddle width and height
+
+    Paddle(float x) {
+        this.x = x;
+    }
+
+    void move(float dy) {
+        y += dy;
+        y = constrain(y, 100, height - h); // Keep paddle within screen
+    }
+
+    void display(float c) {
+        fill(c);
+        rect(x, y, w, h);
     }
 }
 
@@ -377,23 +474,141 @@ void drawIntro() {
 
 }
 
-void drawField() {
-    translate(0, 100);
+int rightScore = 0, leftScore = 0;
 
-    for (int x = 0; x < width; x++) {
-        // Calculate the grayscale value based on the x position
-        float grayValue = map(x, 0, width, 0, 255);
-        stroke(grayValue); // Set the stroke color
-        line(x, 0, x, height); // Draw a vertical line
+void drawField() {
+
+    /*
+     * for (int x = 0; x < width; x++) {
+     * // Calculate the grayscale value based on the x position
+     * float grayValue = map(x, 0, width, 0, 255);
+     * stroke(grayValue); // Set the stroke color
+     * line(x, 0, x, height); // Draw a vertical line
+     * }
+     * 
+     * stroke(255, 215, 0); // Золотой цвет
+     * strokeWeight(10); // Толщина границы
+     * noFill(); // Без заливки
+     * rect(0, 100, width, height - 100); // Граница вокруг всего поля
+     */
+
+    image(loadImage("gradient.jpg"), 0, 0);
+}
+
+void drawScoreboard() {
+    textSize(99); // Set a large font size
+    textAlign(CENTER, CENTER);
+
+    fill(255, 215, 0);
+    // Draw the left score
+    text(leftScore, width / 2 - 200, 50);
+
+    // Draw the right score
+    text(rightScore, width / 2 + 200, 50);
+}
+
+boolean paused;
+
+void drawPauseButton() {
+    // Set the golden color for the pause button
+    fill(255, 215, 0); // Golden color
+    noStroke();
+
+    if (state != PAUSED) {
+        // Draw the pause button (two vertical rectangles)
+        float pauseButtonWidth = 20; // Width of each rectangle
+        float pauseButtonHeight = 80; // Height of each rectangle
+        float gap = 10; // Gap between the two rectangles
+
+        // Left rectangle
+        rect(width / 2 - pauseButtonWidth - gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
+
+        // Right rectangle
+        rect(width / 2 + gap / 2, 10, pauseButtonWidth, pauseButtonHeight);
+    } else {
+        triangle(width / 2 - 34.6, 10, width / 2 - 34.6, 90, width / 2 + 34.6, 50);
+    }
+}
+
+void drawPaddles() {
+    paddle1.display(255);
+    paddle2.display(0);
+}
+
+void drawBalls() {
+    for (Ball ball : balls) {
+
+        pushMatrix();
+        ball.draw();
+        popMatrix();
+
+        if (state == GAME) {
+            ball.move();
+            ball.roll();
+        }
+    }
+}
+
+void initGame() {
+    balls = new ArrayList<Ball>();
+
+    for (int i = 0; i < numBalls; i++) {
+        balls.add(new Ball());
     }
 }
 
 void drawGame() {
 
+    if (paused)
+        return;
     pushMatrix();
     drawField();
     popMatrix();
 
+    pushMatrix();
+    drawPauseButton();
+    popMatrix();
+
+    pushMatrix();
+    drawScoreboard();
+    popMatrix();
+
+    pushMatrix();
+    drawPaddles();
+    popMatrix();
+
+    pushMatrix();
+    drawBalls();
+    popMatrix();
+
+    if (state == RIGHT_WON || state == LEFT_WON) {
+        pushMatrix();
+        textSize(188); // Set a large font size
+        textAlign(CENTER, CENTER);
+
+        fill(255, 215, 0);
+        // Draw the left score
+        text(state == RIGHT_WON ? "RIGHT WINS!!!" : "LEFT WINS!!!",
+                width / 2, height / 2 + 50);
+
+        textSize(66);
+        text("press ENTER to continue game endlessly\npress ESCAPE to exit",
+                width / 2, height / 2 + 222);
+
+        popMatrix();
+        return;
+    }
+
+    if (state == GAME && keyPressed) {
+        if (key == 'a' || key == 'A')
+            paddle1.move(-5); // Left paddle up
+        if (key == 'z' || key == 'Z')
+            paddle1.move(5); // Left paddle down
+        if (key == 'k' || key == 'K')
+            paddle2.move(-5); // Right paddle up
+        if (key == 'm' || key == 'M')
+            paddle2.move(5); // Right paddle down
+    }
 }
 
 void draw() {
@@ -401,8 +616,12 @@ void draw() {
         case INTRO:
             drawIntro();
             break;
+        case RIGHT_WON:
+        case LEFT_WON:
         case GAME:
             drawGame();
+            break;
+        case PAUSED:
             break;
     }
 
@@ -432,11 +651,24 @@ void mousePressed() {
             case INTRO:
                 if (isMouseOverButton(width / 2 - 200, height * 4 / 6, 400, 88)) {
                     state = GAME;
+                    initGame();
                 }
 
                 // Check if "Options" button is clicked
                 else if (isMouseOverButton(width / 2 - 200, height * 5 / 6, 400, 88)) {
                     showOptions = true;
+                }
+                break;
+
+            case GAME:
+                if (isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
+                    state = PAUSED;
+                    drawGame();
+                }
+                break;
+            case PAUSED:
+                if (isMouseOverButton(width / 2 - 33, 0, 66, 100)) {
+                    state = GAME;
                 }
                 break;
         }
@@ -468,7 +700,6 @@ void keyReleased() {
     }
 
     if (showOptions) {
-        print(key, activeInputField);
         if (activeInputField != 0) {
             if (key == BACKSPACE) {
                 // Handle backspace
@@ -507,7 +738,7 @@ void keyReleased() {
                 switch (activeInputField) {
                     case 1:
                         try {
-                            gameSpeed = Integer.parseInt(speedInput);
+                            gameSpeed = max(1, Integer.parseInt(speedInput));
                         } catch (NumberFormatException e) {
                             gameSpeed = 5; // Reset to default if input is invalid
                             speedInput = "5";
@@ -515,7 +746,7 @@ void keyReleased() {
                         break;
                     case 2:
                         try {
-                            numBalls = Integer.parseInt(ballsInput);
+                            numBalls = max(1, Integer.parseInt(ballsInput));
                         } catch (NumberFormatException e) {
                             numBalls = 1; // Reset to default if input is invalid
                             ballsInput = "1";
@@ -523,7 +754,7 @@ void keyReleased() {
                         break;
                     case 3:
                         try {
-                            finishScore = Integer.parseInt(scoreInput);
+                            finishScore = max(1, Integer.parseInt(scoreInput));
                         } catch (NumberFormatException e) {
                             finishScore = 20; // Reset to default if input is invalid
                             scoreInput = "20";
@@ -531,11 +762,17 @@ void keyReleased() {
                         break;
                 }
                 activeInputField = 0;
+
             }
         } else {
             if (key == ENTER || key == RETURN || key == ESC) {
                 showOptions = false;
             }
         }
+    }
+
+    else if (state == RIGHT_WON || state == LEFT_WON) {
+        state = GAME;
+        finishScore = -1;
     }
 }
