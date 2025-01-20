@@ -439,7 +439,6 @@ void drawIntro() {
             int a = constrain(mouseX, 40, width - 40);
             b.t = map(a, 40, width - 40, 0.0, 1.0);
         }
-
         else if (mouseY <= height * 4 / 6 - 11) {
 
             int y = min(mouseY, (int) (height * 4 / 6 - b.r));
@@ -485,7 +484,6 @@ void drawField() {
      * stroke(grayValue); // Set the stroke color
      * line(x, 0, x, height); // Draw a vertical line
      * }
-     * 
      * stroke(255, 215, 0); // Золотой цвет
      * strokeWeight(10); // Толщина границы
      * noFill(); // Без заливки
