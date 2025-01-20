@@ -129,7 +129,7 @@ class Ball {
             reset();
         }
 
-        if(state == GAME) {
+        if(state == GAME && finishScore != -1) {
             if(rightScore == finishScore)
                 state = RIGHT_WON;
             if(leftScore == finishScore)
@@ -749,6 +749,8 @@ void keyReleased() {
                         break;
                 }
                 activeInputField = 0;
+
+                
             }
         } else {
             if (key == ENTER || key == RETURN || key == ESC) {
@@ -756,4 +758,9 @@ void keyReleased() {
             }
         }
     }
+
+    else if(state == RIGHT_WON || state == LEFT_WON) {
+                    state = GAME;
+                    finishScore = -1;
+                }
 }
