@@ -438,8 +438,7 @@ void drawIntro() {
         if (mouseY >= height - 100) {
             int a = constrain(mouseX, 40, width - 40);
             b.t = map(a, 40, width - 40, 0.0, 1.0);
-        }
-        else if (mouseY <= height * 4 / 6 - 11) {
+        } else if (mouseY <= height * 4 / 6 - 11) {
 
             int y = min(mouseY, (int) (height * 4 / 6 - b.r));
             y = max(y, 200);
@@ -598,14 +597,19 @@ void drawGame() {
     }
 
     if (state == GAME && keyPressed) {
-        if (key == 'a' || key == 'A')
+        if (key == 'a' || key == 'A' || key == 'ф' || key == 'Ф') {
             paddle1.move(-5); // Left paddle up
-        if (key == 'z' || key == 'Z')
+        }
+        if (key == 'z' || key == 'Z' || key == 'я' || key == 'Я') {
             paddle1.move(5); // Left paddle down
-        if (key == 'k' || key == 'K')
+        }
+
+        if (key == 'k' || key == 'K' || key == 'л' || key == 'Л') {
             paddle2.move(-5); // Right paddle up
-        if (key == 'm' || key == 'M')
+        }
+        if (key == 'm' || key == 'M' || key == 'ь' || key == 'Ь') {
             paddle2.move(5); // Right paddle down
+        }
     }
 }
 
